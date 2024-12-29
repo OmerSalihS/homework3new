@@ -5,6 +5,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 1. Course overview and syllabus
 
 - **Lecture Videos:**
@@ -15,6 +16,7 @@ Here you will find the course calendar. For each week of the course, we provide 
   - [Assignment](../homework/Homework-0), [Lecture](https://youtu.be/AaPNWj6GgI0): Overview of assignment requirements
 
 <hr>
+
 #### 2. How does the internet work?
 
 
@@ -30,6 +32,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 4. Javascript - the basics
 
 
@@ -84,6 +87,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 10. Asynchronous Communication
 
 
@@ -91,6 +95,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 11. Security and Authentication
 
 
@@ -99,6 +104,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 12. APIs
 
 
@@ -106,6 +112,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 13. Web Drivers and Extensions
 
 
@@ -114,6 +121,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 14. Final Exam Period
 
 No lectures will be posted
@@ -122,7 +130,6 @@ No lectures will be posted
 
 
 <hr>
-
 
 #### 15. Final Exam Period
 
