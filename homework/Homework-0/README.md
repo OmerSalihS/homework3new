@@ -72,7 +72,7 @@ The goal of this assignment is to install, configure, and obtain access to all o
 
 2. From the [Course Materials Page](https://gitlab.msu.edu/cse477-spring-2025/course-materials), Click the Issues option on the left-side panel.
 
-3. Notice that there is one open issue called `Homework 0: Introduce yourself`.
+3. Notice that there is one open issue called `Homework 0: Introduce yourself`. If you want to flag a specific user in a thread, you can do so by using the `@` tag. For instance, if you want to flag a message for Dr. Ghassemi add `@ghassem3` to the message.
 
 4. Click the open issue and respond to the instructions provided in the issue. **Do not close the issue**.
 
