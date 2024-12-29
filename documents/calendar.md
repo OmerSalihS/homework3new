@@ -40,6 +40,7 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 <hr>
+
 #### 5. Javascript - advanced topics
 
 
