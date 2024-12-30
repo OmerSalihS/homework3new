@@ -11,7 +11,7 @@ The names, contact information, office hours, and for the teaching team are show
 | Prof. Mohammad Ghassemi | Instructor                | [ghassem3@msu.edu](mailto:ghassem3@msu.edu) | Available upon request      | N/A | When tagged using `@` |
 | Prof. Ruofeng Lui | Instructor | liuruofe@msu.edu | Available upon request | N/A | When tagged using `@` |
 | Hamzeh Alzweri | Teaching Assistant                     | alzwerih@msu.edu      | Mon:<br /> 12PM - 4PM | [zoom link](https://msu.zoom.us/j/97594501737)                           | Mon, Thurs |
-| Joseph Baran | Teaching Assistant                     | baranjo1@msu.edu | Tues:<br /> 12PM - 4PM | [zoom link]() | Tues, Fri |
+| Joseph Baran | Teaching Assistant                     | baranjo1@msu.edu | Tues:<br /> 12PM - 4PM | [zoom link](https://msu.zoom.us/j/5319715753) | Tues, Fri |
 | Sihan Wang | Teaching Assistant                     | wangsih3@msu.edu            | Wed:<br /> 12PM - 4PM | [zoom link](https://msu.zoom.us/j/5117940001) | Wed, Sat |
 | Weikang Ding | Teaching Assistant | dingweik@msu.edu | Thurs:<br /> 12PM - 4PM | [zoom link]() | Thurs, Sun |
 
