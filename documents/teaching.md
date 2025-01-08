@@ -25,7 +25,7 @@ If  you need help, please follow these three steps, in order:
 
 1. First, [post an Issue to the Course Gitlab](https://gitlab.msu.edu/cse477-spring-2025/course-materials/-/issues); please use appropriate labels.
 2. If needed, attend office hours with the Teaching Assistants. (see table above)
-3. If you don't get a high-quality response, add the course instructor to the issue (e.g. uby adding `@ghassem3` in your message)
+3. If you don't get a high-quality response, add the course instructor to the issue (e.g. by adding `@ghassem3` in your message)
 
 
 
