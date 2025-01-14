@@ -98,8 +98,6 @@ As part of this course, you will obtain hands-on experience publishing live web 
 1. [Log into the Google Cloud Console](https://console.cloud.google.com).
 2. Navigate to [GCP's Storage Page](https://console.cloud.google.com/storage) and click **ENABLE BILLING** in the banner near the top of the page.
 
-2. Select "*Billing Account for Education*" as the Billing Account. 
-
    
 
 ##### Install Google Cloud SDK
