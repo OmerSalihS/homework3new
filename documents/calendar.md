@@ -19,7 +19,33 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 #### 2. How does the internet work?
 
+* **Lecture Videos:**
 
+  * [Lecture](https://youtu.be/9_uYlzaU29g): Introduction
+
+  * [Lecture](https://youtu.be/hfbHZxBZbQ8): Internet Growth and Usage
+
+  * [Lecture](https://youtu.be/6iz9tgF9sKo), [Reading](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/How_does_the_Internet_work): How does the internet work?
+
+  * [Lecture](https://youtu.be/P875_nCUaQ4), [Reading](https://www.kaspersky.com/resource-center/definitions/what-is-an-ip-address): What is an IP address? 
+
+  * [Lecture](https://youtu.be/RvSgbEbMd0w), [Reading](https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/How_the_Web_works): How does the web work? 
+
+  * [Lecture](https://youtu.be/2G3WYxxKAaU), [Reading](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_is_a_URL): What is a URL? 
+
+  * [Lecture](https://youtu.be/2IxMKuaOFjo), [Reading](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_is_a_domain_name): What are domains and DNS? 
+
+  * [Lecture](https://youtu.be/5hFUqCIq0xw), [Reading](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview): Overview of HTTP
+
+    * [Supplemental](https://dev.opera.com/articles/http-basic-introduction/): HTTP an Application-Level Protocol
+
+    * [Supplemental](https://dev.opera.com/articles/http-response-codes/): HTTP Response Codes
+
+      
+
+* **Homework 1:** Build the frontend of your personal webpage; 
+
+  * [Assignment](../homework/Homework-1), [Lecture](https://youtu.be/RxyNQgcdNiY): Overview of assignment requirements
 
 
 
