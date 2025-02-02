@@ -107,6 +107,30 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 
 
+**[Lecture](https://youtu.be/8uePV_OiPMQ):  JavaScript Essentials**
+
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_is_JavaScript): What is JavaScript?
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/A_first_splash): Basic syntax
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/What_went_wrong): Troubleshooting
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Variables): Variables
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Math): Math
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Strings): Strings
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Useful_string_methods): String Methods
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/First_steps/Arrays): Arrays
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/conditionals): Conditionals
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Looping_code): Loops
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Functions): Built-in functions
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Build_your_own_function): Custom functions
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Return_values): Return values
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Building_blocks/Events): Events
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Basics): Basics
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Object_prototypes): Prototypes
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Object-oriented_programming): Object-oriented concepts
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/Classes_in_JavaScript): Classes
+* [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON): JSON data
+
+
+
 
 
 <hr>
@@ -114,6 +138,18 @@ Here you will find the course calendar. For each week of the course, we provide 
 #### 5. Javascript - advanced topics
 
 
+
+**Lecture Videos:**
+
+* **[Lecture](https://youtu.be/yXlCBnXdQ7c): Advanced Topics in JavaScript**
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Manipulating_documents): Manipulating documents
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Drawing_graphics): Drawing graphics
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Client-side_storage): Client-side storage
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Introduction): Introduction to Client-side frameworks
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_getting_started): Getting started with Vue
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_first_component): Creating a view component
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_rendering_lists): Rendering a list of Vue components
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/Vue_methods_events_models): Vue events, methods, and models
 
 
 
