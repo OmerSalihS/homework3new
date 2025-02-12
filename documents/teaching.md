@@ -10,7 +10,7 @@ The names, contact information, office hours, and for the teaching team are show
 | ----------------------- | ------------------------- | ------------------------------------------- | --------------------------- | -------------------------------------------- | ---------------------- |
 | Prof. Mohammad Ghassemi | Instructor                | [ghassem3@msu.edu](mailto:ghassem3@msu.edu) | Available upon request      | N/A | When tagged using `@` |
 | Prof. Ruofeng Lui | Instructor | liuruofe@msu.edu | Available upon request | N/A | When tagged using `@` |
-| Hamzeh Alzweri | Teaching Assistant                     | alzwerih@msu.edu      | Mon:<br /> 11AM - 1:00PM & 1:35PM - 3:35PM | [zoom link](https://msu.zoom.us/s/97594501737)                           | Mon, Thurs (Before 4PM) |
+| Hamzeh Alzweri | Teaching Assistant                     | alzwerih@msu.edu      | Mon:<br /> 9:00AM - 1:00PM | [zoom link](https://msu.zoom.us/s/97594501737)                           | Mon, Thurs (Before 4PM) |
 | Joseph Baran | Teaching Assistant                     | baranjo1@msu.edu | Tues:<br /> 3PM - 7PM | [zoom link](https://msu.zoom.us/j/5319715753) 062729 | Tues, Fri |
 | Sihan Wang | Teaching Assistant                     | wangsih3@msu.edu            | Wed:<br /> 12PM - 4PM | [zoom link](https://msu.zoom.us/j/5117940001) | Wed, Sat |
 | Weikang Ding | Teaching Assistant | dingweik@msu.edu | Thurs:<br /> 10AM - 11.30AM & 3.30PM - 6PM <br />  **2/13, 9 AM – 1 PM** | [zoom link](https://msu.zoom.us/my/weikangdingmsu) 4r4MwH | Thurs (After 4PM), Sun |
