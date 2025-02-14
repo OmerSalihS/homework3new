@@ -13,7 +13,7 @@ The names, contact information, office hours, and for the teaching team are show
 | Hamzeh Alzweri | Teaching Assistant                     | alzwerih@msu.edu      | Mon:<br /> 9:00AM - 1:00PM | [zoom link](https://msu.zoom.us/s/97594501737)                           | Mon, Thurs (Before 4PM) |
 | Joseph Baran | Teaching Assistant                     | baranjo1@msu.edu | Tues:<br /> 3PM - 7PM | [zoom link](https://msu.zoom.us/j/5319715753) 062729 | Tues, Fri |
 | Sihan Wang | Teaching Assistant                     | wangsih3@msu.edu            | Wed:<br /> 12PM - 4PM | [zoom link](https://msu.zoom.us/j/5117940001) | Wed, Sat |
-| Weikang Ding | Teaching Assistant | dingweik@msu.edu | Thurs:<br /> 10AM - 11.30AM & 3.30PM - 6PM <br />  **2/13, 9 AM – 1 PM** | [zoom link](https://msu.zoom.us/my/weikangdingmsu) 4r4MwH | Thurs (After 4PM), Sun |
+| Weikang Ding | Teaching Assistant | dingweik@msu.edu | Thurs:<br /> 10AM - 11.30AM & 3.30PM - 6PM | [zoom link](https://msu.zoom.us/my/weikangdingmsu) 4r4MwH | Thurs (After 4PM), Sun |
 
 On the left most column, we list the member of the teaching team that will take **final responsibility** for answering questions posted on the [course-materials Gitlab Issues page](https://gitlab.msu.edu/cse477-spring-2025/course-materials/-/issues) on the Gitlab Service Day (rightmost-column). 72 hours prior to assignment due dates all Teaching Assistants are expected to assist with responding to Gitlab Issues, regardless of their Gitlab Service Day allocation in the table above.
 
