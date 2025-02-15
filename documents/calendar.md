@@ -157,7 +157,9 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 #### 6. Flask - A Python Backend
 
+**Homework 2:** Build the backend of your personal webpage;
 
+* [Assignment](../homework/Homework-2), [Lecture](https://youtu.be/VGlTVNcUJX4): Overview of assignment requirements and Backend development.
 
 
 
@@ -165,7 +167,13 @@ Here you will find the course calendar. For each week of the course, we provide 
 
 #### 7.  Introduction to backend development
 
+Lecture Videos:
 
+* [Lecture](https://youtu.be/PnDKd2EeERc): **Server side development**
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Introduction): Introduction to the server side
+  * [Reading](https://developer.mozilla.org/en-US/docs/Learn/Server-side/First_steps/Client-Server_overview): Client-Server Overview
+  * [Reading](https://flask.palletsprojects.com/en/2.0.x/quickstart/#html-escaping): Flask Quickstart Guide 
+  * [Reading](https://jinja.palletsprojects.com/en/3.0.x/templates/): Document templating with Jinja
 
 
 

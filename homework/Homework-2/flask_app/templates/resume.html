@@ -1,0 +1,23 @@
+{% extends 'shared/layout.html' %}
+
+{% block maincontent %}
+
+      <!-- For each institution - generate a row --> 
+      {% for inst_id, inst in resume_data.items() %}
+      <!-- Do something... -->
+      <h1>{{ inst['name']}} </h1>
+        {% if inst['positions'] != {} %}
+          {% for pos_id, pos in inst['positions'].items() %}
+          <!-- Do something else... -->
+          <h2>{{ pos['title']}} </h2>
+          {% endfor %}
+        {% endif %}
+
+      <hr>
+      {% endfor %}
+
+
+
+{% endblock %}
+
+
