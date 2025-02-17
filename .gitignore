@@ -1,0 +1,29 @@
+# optimized files --------
+.DS_Store
+
+# Other ------------------
+__pycache__/
+
+# ----------------------------------------------------------------
+# Private Course Calendar : Should not be uncommented
+# ----------------------------------------------------------------
+documents/calendar-dev.md
+
+# ----------------------------------------------------------------
+# Homeworks: to release, add a `#` in front of the homework name.
+# ---------------------------------------------------------------- 
+#homework/Homework-1/
+#homework/Homework-2/
+homework/Homework-3/
+homework/Final-Exam/
+
+# ----------------------------------------------------------------
+# Solutions : this should NEVER be uncommented.
+# ----------------------------------------------------------------
+sandbox/
+solutions/
+solutions/Homework-1/
+solutions/Homework-2/
+solutions/Homework-3/
+solutions/Homework-4/
+
