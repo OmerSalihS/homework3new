@@ -1,0 +1,14 @@
+{% extends 'shared/layout.html' %}
+
+{% block maincontent %}
+    <div class="content-container">
+        <div class="left-column">
+            <img src="{{ url_for('static', filename='main/images/profile.jpeg') }}" alt="Your Photo" class="profile-img">
+        </div>
+        <div class="right-column">
+            <h2>Omer Sipahioglu</h2>
+            <p>Hi, I'm Omer Sipahioglu, I am from Istanbul, Turkey. I have a deep love for the world of Formula 1, I love the thrill of speed and the engineering never fails to excite me. When I'm not watching races, I love cats—they have a special place in my heart with their unique personalities and calming presence. I'm also an avid fan of Mixed Martial Arts, appreciating the discipline, strategy, and sheer athleticism that the sport demands. Whether it's the loud roar of F1 engines, the purr of a cat, or the excitement of an MMA match, I try to find joy in things.</p>
+            <p class="fun-fact">Fun Fact: My cat's name is Cat.</p>
+        </div>
+    </div>
+{% endblock %}

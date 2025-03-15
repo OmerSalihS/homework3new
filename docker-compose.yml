@@ -1,0 +1,43 @@
+# Author  : Prof. MM Ghassemi <ghassem3@msu.edu>
+
+version: "3.8"
+services:
+  # Flask Web Application
+  flask-app:
+    container_name: hw2-container_flask-app
+    # Indicates that `Dockerfile-dev` should be used for local instantiations
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    stdin_open: true
+    tty: true
+    ports:
+      - "8080:8080"
+    # Mounts the local directory to docker container as a volume.
+    volumes:
+      - .:/app
+    depends_on:
+      - mysql  # Ensures MySQL starts before Flask
+
+  # MySQL Database
+  mysql:
+    container_name: hw2-container-mysql
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+      MYSQL_USER: master
+      MYSQL_PASSWORD: master
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hw2-network
+
+volumes:
+  mysql_data:
+
+networks:
+  hw2-network:

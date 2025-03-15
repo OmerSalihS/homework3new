@@ -1,0 +1,6 @@
+"experience_id","position_id","name","description","hyperlink","start_date","end_date"
+"1","1","Financial Trading Simulation","Developed a comprehensive trading exchange system in C++ for asset deposits, buy/sell orders, and fund withdrawals.",NULL,"2023-04-01","2023-04-30"
+"3","2","Website Enhancement Project","Applied HTML and front-end web design principles to support website layout updates and content migration projects.",NULL,"2024-02-01",NULL
+"4","3","Programming Mentorship","Explained challenging concepts to 150+ students and graded assignments.",NULL,"2023-01-01",NULL
+"5","4","Drone Design Competition","Led team to win 3rd Place out of 140 Teams in 2020 and 2nd Place out of 250 Teams in 2021.",NULL,"2020-01-01","2022-01-31"
+"6","4","Educational Workshop Series","Presented workshops on robotics and technology for elementary school students.",NULL,"2020-06-01","2021-12-31"

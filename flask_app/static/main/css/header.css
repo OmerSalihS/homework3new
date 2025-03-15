@@ -1,0 +1,24 @@
+header {
+    background-color: #1f1f1f; /* Dark background */
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+}
+
+header h1 {
+    font-size: 18px;
+    margin: 0;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+header a:hover {
+    opacity: 0.7;
+}
