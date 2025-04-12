@@ -17,23 +17,32 @@ socketio = SocketIO(cors_allowed_origins="*")
 def create_app(debug=False):
 	app = Flask(__name__)
 
-	# NEW IN HOMEWORK 3 ----------------------------
-	# This will prevent issues with cached static files
+	# Configure the application
 	app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 	app.debug = debug
-	# The secret key is used to cryptographically-sign the cookies used for storing the session data.
-	app.secret_key = 'AKWNF1231082fksejfOSEHFOISEHF24142124124124124iesfhsoijsopdjf'
-	# ----------------------------------------------
+	app.secret_key = os.environ.get('SECRET_KEY', 'AKWNF1231082fksejfOSEHFOISEHF24142124124124124iesfhsoijsopdjf')
 
+	# Initialize database
 	from .utils.database.database import database
 	db = database()
-	db.createTables(purge=True)
 	
-	# NEW IN HOMEWORK 3 ----------------------------
-	# This will create a user
-	db.createUser(email='owner@email.com' ,password='password', role='owner', name='Owner')
-	db.createUser(email='guest@email.com' ,password='password', role='guest', name='Guest')
-	# ----------------------------------------------
+	# Only create tables if they don't exist
+	try:
+		db.createTables(purge=False)
+		
+		# Create test users only if they don't exist
+		try:
+			db.createUser(email='owner@email.com', password='password', role='owner', name='Owner')
+		except:
+			pass  # User might already exist
+			
+		try:
+			db.createUser(email='guest@email.com', password='password', role='guest', name='Guest')
+		except:
+			pass  # User might already exist
+	except Exception as e:
+		app.logger.error(f"Database initialization error: {str(e)}")
+		# Continue without database - will show error page
 
 	socketio.init_app(app)
 
