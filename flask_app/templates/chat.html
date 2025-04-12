@@ -87,18 +87,15 @@
 
 {% block extrajs %}
 <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="https://cdn.socket.io/3.1.1/socket.io.min.js"></script>
 <script type="text/javascript" charset="utf-8">
     var socket;
-    var isOwner = "{{ 'true' if session.get('role') == 'owner' else 'false' }}";
+    var isOwner = {% if session.get('role') == 'owner' %}true{% else %}false{% endif %};
     
     $(document).ready(function(){
-        // Connect to the socket server with the correct namespace
-        socket = io('/chat', {
-            transports: ['websocket'],
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000
+        // Connect to the socket server
+        socket = io.connect('http://' + document.domain + ':' + location.port + '/chat', {
+            transports: ['websocket', 'polling']
         });
         
         // Debug connection events
@@ -109,7 +106,6 @@
         
         socket.on('connect_error', function(error) {
             console.error('Connection error:', error);
-            alert('Failed to connect to chat server. Please try refreshing the page.');
         });
         
         socket.on('disconnect', function() {

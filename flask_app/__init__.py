@@ -8,7 +8,6 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_failsafe import failsafe
 
-# Initialize SocketIO with basic configuration
 socketio = SocketIO(cors_allowed_origins="*")
 
 #--------------------------------------------------

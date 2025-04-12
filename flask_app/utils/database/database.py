@@ -12,12 +12,12 @@ from cryptography.fernet import Fernet
 class database:
 
     def __init__(self, purge=False):
-        # Grab information from environment variables with fallback to defaults
-        self.database = os.getenv('DB_NAME', 'db')
-        self.host = os.getenv('DB_HOST', '127.0.0.1')
-        self.user = os.getenv('DB_USER', 'master')
-        self.port = int(os.getenv('DB_PORT', '3306'))
-        self.password = os.getenv('DB_PASSWORD', 'master')
+        # Grab information from the configuration file
+        self.database = 'db'
+        self.host = '127.0.0.1'
+        self.user = 'master'
+        self.port = 3306
+        self.password = 'master'
         
         # Encryption settings
         self.encryption = {
