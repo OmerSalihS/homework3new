@@ -56,7 +56,7 @@ mysql -e "GRANT ALL PRIVILEGES ON db.* TO '\''master'\''@'\''localhost'\'';"\n\
 mysql -e "FLUSH PRIVILEGES;"\n\
 \n\
 echo "Starting Gunicorn..."\n\
-exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 --log-level debug app:app' > /app/start.sh && \
+exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 --log-level debug app:app' > /app/start.sh && \
 chmod +x /app/start.sh
 
 # Set environment variables
