@@ -8,13 +8,53 @@ import logging
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_failsafe import failsafe
+from flask_login import LoginManager
+from .utils.database.sqlite_database import SQLiteDatabase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize SocketIO with async_mode set to eventlet
-socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet', logger=True, engineio_logger=True)
+# Initialize Flask app
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-here'  # Change this in production
+
+# Initialize SocketIO
+socketio = SocketIO(app)
+
+# Initialize LoginManager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+# Initialize database
+db = SQLiteDatabase()
+
+# Create test users if they don't exist
+def create_test_users():
+	try:
+		# Create owner user
+		db.createUser(
+			email='owner@example.com',
+			password='owner123',
+			name='Owner User',
+			role='owner'
+		)
+		
+		# Create guest user
+		db.createUser(
+			email='guest@example.com',
+			password='guest123',
+			name='Guest User',
+			role='user'
+		)
+		
+		logger.info("Test users created successfully")
+	except Exception as e:
+		logger.error(f"Error creating test users: {str(e)}")
+
+# Create test users when the app starts
+create_test_users()
 
 #--------------------------------------------------
 # Create a Failsafe Web Application
@@ -64,3 +104,17 @@ def create_app(debug=False):
 	except Exception as e:
 		logger.error(f"Error creating application: {str(e)}")
 		raise
+
+# Register error handlers
+@app.errorhandler(404)
+def not_found_error(error):
+	logger.error(f"404 error: {error}")
+	return "Page not found", 404
+
+@app.errorhandler(500)
+def internal_error(error):
+	logger.error(f"500 error: {error}")
+	return "Internal server error", 500
+
+if __name__ == '__main__':
+	socketio.run(app, debug=True, host='0.0.0.0', port=8080)

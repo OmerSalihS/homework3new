@@ -1,15 +1,17 @@
 # Author: Prof. MM Ghassemi <ghassem3@msu.edu>
 from flask import current_app as app
-from flask import render_template, redirect, request, session, url_for
+from flask import render_template, redirect, request, session, url_for, jsonify, flash
 from flask_socketio import emit, join_room, leave_room
-from .utils.database.database  import database
+from flask_login import login_user, logout_user, login_required, current_user
+from .utils.database.database import createUser, authenticate, saveChatMessage, getChatMessages
 from werkzeug.datastructures import ImmutableMultiDict
 from pprint import pprint
 import json
 import random
 import functools
 import logging
-from . import socketio
+from . import socketio, db
+from datetime import datetime
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -19,125 +21,90 @@ db = database()
 #######################################################################################
 # AUTHENTICATION RELATED
 #######################################################################################
-def login_required(func):
-    @functools.wraps(func)
-    def secure_function(*args, **kwargs):
-        if "email" not in session:
-            return redirect(url_for("login", next=request.url))
-        return func(*args, **kwargs)
-    return secure_function
-
 def getUser():
-	return session.get('name', 'Unknown')
+    if 'email' in session:
+        return session['email']
+    return 'Unknown'
+
+@app.route('/')
+def home():
+    return render_template('home.html')
 
 @app.route('/login')
 def login():
-	return render_template('login.html')
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():
-	# Clear all session data
-	session.clear()
-	return redirect('/')
+    session.clear()
+    return redirect(url_for('home'))
 
-@app.route('/processlogin', methods = ["POST","GET"])
+@app.route('/processlogin', methods=['POST'])
 def processlogin():
-	try:
-		form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
-		email = form_fields['email']
-		password = form_fields['password']
-		
-		# Authenticate the user
-		auth_result = db.authenticate(email=email, password=password)
-		
-		if auth_result['success'] == 1:
-			# Store the encrypted email and name in the session
-			session['email'] = db.reversibleEncrypt('encrypt', email)
-			session['name'] = auth_result['name']
-			session['role'] = auth_result['role']
-			
-			# Reset failed login attempts counter
-			session['failed_attempts'] = 0
-			
-			# Check if there's a next parameter for redirect
-			next_url = request.args.get('next')
-			if next_url and next_url.startswith('/'):
-				return json.dumps({'success': 1, 'redirect': next_url})
-			return json.dumps({'success': 1, 'redirect': '/home'})
-		else:
-			# Increment failed login attempts counter
-			failed_attempts = session.get('failed_attempts', 0) + 1
-			session['failed_attempts'] = failed_attempts
-			
-			# Authentication failed
-			return json.dumps({
-				'success': 0, 
-				'message': auth_result['message'],
-				'failed_attempts': failed_attempts
-			})
-	except Exception as e:
-		logger.error(f"Error in processlogin: {str(e)}")
-		return json.dumps({'success': 0, 'message': 'An error occurred during login'})
-
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    
+    result = authenticate(email, password)
+    if result['success']:
+        session['user_id'] = result['user']['id']
+        session['email'] = result['user']['email']
+        session['name'] = result['user']['name']
+        session['role'] = result['user']['role']
+    return jsonify(result)
 
 #######################################################################################
 # CHATROOM RELATED
 #######################################################################################
 @app.route('/chat')
-@login_required
 def chat():
-    return render_template('chat.html', user=getUser())
+    if 'email' not in session:
+        return redirect(url_for('login'))
+    return render_template('chat.html')
 
-@socketio.on('joined', namespace='/chat')
-def joined(message):
-    try:
-        logger.info("User joined chat")
-        join_room('main')
-        user = getUser()
-        is_owner = session.get('role') == 'owner'
-        role = "Owner" if is_owner else "Guest"
-        emit('status', {'msg': f"{user} ({role}) has entered the room.", 'class': 'system-message'}, room='main')
-    except Exception as e:
-        logger.error(f"Error in joined event: {str(e)}")
+@socketio.on('join')
+def on_join():
+    if 'email' in session:
+        join_room('chat')
+        emit('status', {'msg': f"{session['email']} has entered the room."}, room='chat')
+        # Load previous messages
+        messages = getChatMessages()
+        for msg in messages:
+            emit('message', {
+                'user': msg['user'],
+                'message': msg['message'],
+                'role': msg['role'],
+                'timestamp': msg['timestamp']
+            }, room='chat')
 
-@socketio.on('left', namespace='/chat')
-def left(message):
-    try:
-        logger.info("User left chat")
-        user = getUser()
-        is_owner = session.get('role') == 'owner'
-        role = "Owner" if is_owner else "Guest"
-        emit('status', {'msg': f"{user} ({role}) has left the room.", 'class': 'system-message'}, room='main')
-        leave_room('main')
-    except Exception as e:
-        logger.error(f"Error in left event: {str(e)}")
+@socketio.on('leave')
+def on_leave():
+    if 'email' in session:
+        leave_room('chat')
+        emit('status', {'msg': f"{session['email']} has left the room."}, room='chat')
 
-@socketio.on('message', namespace='/chat')
-def handle_message(message):
-    try:
-        logger.info(f"Received message: {message}")
-        user = getUser()
-        is_owner = session.get('role') == 'owner'
-        role = "Owner" if is_owner else "Guest"
+@socketio.on('message')
+def handle_message(data):
+    if 'email' in session:
+        user = session['email']
+        role = session.get('role', 'user')
+        message = data.get('message', '')
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        # Determine message class based on user role
-        msg_class = 'owner-message' if is_owner else 'user-message'
+        # Save message to database
+        saveChatMessage(user, message, role)
         
-        # Format the message with the user's name and role
-        formatted_msg = f"{user} ({role}): {message['msg']}"
-        
-        # Emit the message to all users in the room
-        emit('status', {'msg': formatted_msg, 'class': msg_class}, room='main')
-    except Exception as e:
-        logger.error(f"Error in handle_message event: {str(e)}")
+        # Emit message to all users in the room
+        emit('message', {
+            'user': user,
+            'message': message,
+            'role': role,
+            'timestamp': timestamp
+        }, room='chat')
 
 #######################################################################################
 # OTHER
 #######################################################################################
-
-@app.route('/')
-def root():
-	return redirect('/home')
 
 @app.route('/home')
 def home():
@@ -192,19 +159,13 @@ def processfeedback():
 def register():
     return render_template('register.html')
 
-@app.route('/processregister', methods=["POST", "GET"])
+@app.route('/processregister', methods=['POST'])
 def processregister():
-    try:
-        form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
-        email = form_fields['email']
-        password = form_fields['password']
-        role = form_fields['role']
-        name = form_fields['name']
-        
-        # Create the user
-        result = db.createUser(email=email, password=password, role=role, name=name)
-        
-        return json.dumps(result)
-    except Exception as e:
-        logger.error(f"Error in processregister route: {str(e)}")
-        return json.dumps({'success': 0, 'message': 'An error occurred during registration'})
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    name = data.get('name')
+    role = data.get('role', 'user')
+    
+    success, message = createUser(email, password, name, role)
+    return jsonify({'success': success, 'message': message})
