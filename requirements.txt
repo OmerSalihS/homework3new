@@ -8,3 +8,4 @@ mysql-connector-python
 SQLAlchemy
 Flask-SQLAlchemy
 python-dotenv
+kombu

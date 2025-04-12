@@ -19,10 +19,11 @@ COPY . .
 # Set environment variables
 ENV PORT=8080
 ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
 
 # Expose the port
 EXPOSE 8080
 
-# Start the application
+# Start the application with proper WebSocket support
 CMD exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 app:app
 # ----------------------------------------------------- 
