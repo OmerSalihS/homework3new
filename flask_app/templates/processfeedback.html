@@ -1,0 +1,36 @@
+{% extends 'shared/layout.html' %}
+
+{% block maincontent %}
+<div class="feedback-list-container">
+  <div class="feedback-header">
+    <h1>Feedback Submissions</h1>
+    <p>Thank you for your feedback! Here are all the comments we've received.</p>
+  </div>
+  
+  {% if feedback_data %}
+    {% for feedback in feedback_data %}
+      <div class="feedback-card">
+        <div class="feedback-info">
+          <div class="feedback-author">
+            {% if feedback.name %}
+              {{ feedback.name }}
+            {% else %}
+              Anonymous
+            {% endif %}
+          </div>
+          {% if feedback.email %}
+            <div class="feedback-email">{{ feedback.email }}</div>
+          {% endif %}
+        </div>
+        <div class="feedback-content">{{ feedback.comment }}</div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="no-feedback">
+      <p>No feedback has been submitted yet.</p>
+    </div>
+  {% endif %}
+  
+  <a href="/" class="back-button">Back to Home</a>
+</div>
+{% endblock %}

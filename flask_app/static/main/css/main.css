@@ -1,0 +1,223 @@
+/* ========== General Styles ========== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+/* LinkedIn Icon */
+.linkedin-icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ========== Header (Banner) ========== */
+header {
+    position: relative;
+    width: 100%;
+    height: 30vh;
+    background: url('../static/banner.jpg') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner h1 {
+    color: white;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* ========== Navigation Bar ========== */
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #333;
+    padding: 15px 30px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.nav-links a:hover {
+    opacity: 0.7;
+}
+
+/* Mobile Menu */
+.menu-icon {
+    display: none;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+}
+
+/* ========== Main Content (Home Page) ========== */
+.content-container {
+    display: flex;
+    max-width: 80vw;
+    margin: 40px auto;
+    align-items: center;
+    text-align: center;
+}
+
+/* Left column (Profile Image) */
+.left-column {
+    flex: 1;
+}
+
+.profile-img {
+    width: 100%;
+    max-width: 300px;
+    border-radius: 10px;
+}
+
+/* Right column (Text) */
+.right-column {
+    flex: 1;
+    text-align: left;
+}
+
+/* Fun Fact Styling */
+.fun-fact {
+    font-style: italic;
+    margin-top: 10px;
+    color: #555;
+}
+
+/* ========== Main Content (Projects Page) ========== */
+.intro {
+    text-align: center;
+    padding: 20px;
+}
+
+.project-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 80vw;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Left column (Image) */
+.left-column {
+    flex: 1;
+}
+
+.project-image {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+/* Right column (Text) */
+.right-column {
+    flex: 2;
+    padding-left: 20px;
+    text-align: left;
+}
+
+/* Hyperlink Styling */
+.right-column a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.right-column a:hover {
+    color: darkblue;
+}
+
+/* ========== Footer ========== */
+footer {
+    background: #222;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    margin-top: 20px;
+}
+
+/* ========== Mobile Responsiveness ========== */
+@media screen and (max-width: 650px) {
+    /* Responsive Navbar */
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: #333;
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links li {
+        margin: 10px 0;
+    }
+
+    .menu-icon {
+        display: block;
+    }
+
+    /* Home Page Responsive */
+    .content-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .right-column {
+        text-align: center;
+    }
+
+    /* Projects Page Responsive */
+    .project-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .right-column {
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .project-image {
+        max-width: 80%;
+    }
+}
+
+/* User Info Styling */
+.user-info {
+    background-color: #f0f0f0;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #333;
+}
+
+.user-info p {
+    margin: 0;
+    color: #333;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Omer's personal page</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/main.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/piano.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/header.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/resume.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/feedback.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='main/css/processfeedback.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='main/images/favicon.ico') }}">
+  {% block extracss %}{% endblock %}
+  <script src="{{ url_for('static', filename='main/js/main.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='piano/js/piano.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='main/js/feedback.js') }}" defer></script>
+  {% block extrajs %}{% endblock %}
+</head>
+
+<body>
+    <article>
+    <!-- The header  -->
+    <header>
+        <p>Welcome to my Personal Website</p>
+        {% if session.get('name') %}
+            <p class="welcome-text">Welcome, {{ session.get('name') }}!</p>
+        {% endif %}
+    </header>
+
+    <!-- The navigation bar -->
+    <nav>
+      <div>
+        <p>CSE 477 - Homework 2</p>
+      </div>
+
+      <div class="links">
+        <a href="/home">Home</a>
+        <a href="/resume">Resume</a>
+        <a href="/projects">Projects</a>
+        <a href="/piano">Piano</a>
+        {% if session.get('email') %}
+          <a href="/chat">Chat</a>
+          <a href="/logout">Logout</a>
+        {% else %}
+          <a href="/chat">Chat</a>
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <!-- The main content  -->
+    <main>
+      {% block maincontent %}{% endblock %}
+    </main>
+
+    <!-- The footer of the file -->
+    <footer>
+        <p>© 2025 Omer Sipahioglu</p>
+    </footer>
+
+    <!-- Feedback Button -->
+    <button id="feedback-btn" class="feedback-toggle-btn">Feedback</button>
+
+    <!-- Feedback Form -->
+    <div id="feedback-form-container" class="feedback-form-container">
+      <form action="/processfeedback" method="POST" enctype="multipart/form-data" class="feedback-form">
+        <h3>Share Your Feedback</h3>
+        
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" placeholder="Your name">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" placeholder="Your email">
+        </div>
+        
+        <div class="form-group">
+          <label for="comment">Comment:</label>
+          <textarea id="comment" name="comment" placeholder="Your feedback" rows="4"></textarea>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="submit-btn">Submit</button>
+          <button type="button" class="cancel-btn" id="cancel-feedback">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    </article>
+  
+</body>
+
+</html>

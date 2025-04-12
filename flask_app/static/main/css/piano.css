@@ -1,0 +1,95 @@
+/* Poem Styling */
+.poem {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.2rem;
+    margin: 20px;
+}
+
+/* Piano Container */
+.piano-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Piano Title */
+.piano-title {
+    font-family: 'Cursive', sans-serif;
+    font-size: 1.8rem;
+    color: white;
+    background: #222;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 10px;
+}
+
+/* Piano Container */
+.piano {
+    display: flex;
+    position: relative;
+    justify-content: center;
+}
+
+/* White Keys */
+.white-key {
+    width: 60px;
+    height: 180px;
+    background: white;
+    border: 2px solid black;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Black Keys */
+.black-key {
+    width: 30px;
+    height: 120px;
+    background: black;
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/*  Black Key Placement */
+.black-key:nth-of-type(1) { left: 45px; } 
+.black-key:nth-of-type(2) { left: 105px; } 
+.black-key:nth-of-type(3) { left: 225px; } 
+.black-key:nth-of-type(4) { left: 285px; } 
+.black-key:nth-of-type(5) { left: 345px; } 
+.black-key:nth-of-type(6) { left: 465px; } 
+.black-key:nth-of-type(7) { left: 525px; } 
+
+/* Hide Key Letters Initially */
+.piano div span {
+    display: none;
+}
+
+/* Show Letters on Hover */
+.white-key:hover span, .black-key:hover span {
+    display: block;
+    color: gray;
+}
+
+/* Pressed Key Effect */
+.white-key:active, .black-key:active {
+    transform: translateY(5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+/* Fade Effect for Awakening */
+.awakened {
+    opacity: 0;
+    transition: opacity 3s ease-in-out;
+}

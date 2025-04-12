@@ -1,0 +1,176 @@
+{% extends 'shared/layout.html' %}
+
+{% block extracss %}
+<style> 
+#chat {
+  width: 100%;
+  height: 350px;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  resize: none;
+  overflow-y: auto;
+}
+
+.message-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.chat-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.send-btn, .leave-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.send-btn {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.leave-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.send-btn:hover {
+  background-color: #45a049;
+}
+
+.leave-btn:hover {
+  background-color: #d32f2f;
+}
+
+.message {
+  margin: 5px 0;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.owner-message {
+  background-color: #e3f2fd;
+  color: blue;
+  text-align: right;
+  margin-left: 20%;
+}
+
+.user-message {
+  background-color: #f5f5f5;
+  color: #333;
+  text-align: left;
+  margin-right: 20%;
+}
+
+.system-message {
+  background-color: #fff3e0;
+  color: #ff9800;
+  text-align: center;
+  font-style: italic;
+}
+</style>
+{% endblock %}
+
+{% block extrajs %}
+<script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+<script src="https://cdn.socket.io/3.1.1/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket;
+    var isOwner = {% if session.get('role') == 'owner' %}true{% else %}false{% endif %};
+    
+    $(document).ready(function(){
+        // Connect to the socket server
+        socket = io.connect('http://' + document.domain + ':' + location.port + '/chat', {
+            transports: ['websocket', 'polling']
+        });
+        
+        // Debug connection events
+        socket.on('connect', function() {
+            console.log('Connected to server');
+            socket.emit('joined', {});
+        });
+        
+        socket.on('connect_error', function(error) {
+            console.error('Connection error:', error);
+        });
+        
+        socket.on('disconnect', function() {
+            console.log('Disconnected from server');
+        });
+        
+        // Handle incoming messages
+        socket.on('status', function(data) {     
+            console.log('Received message:', data);
+            let tag = document.createElement("p");
+            let text = document.createTextNode(data.msg);
+            let element = document.getElementById("chat");
+            tag.appendChild(text);
+            tag.className = data.class;
+            element.appendChild(tag);
+            $('#chat').scrollTop($('#chat')[0].scrollHeight);
+        });
+        
+        // Handle sending messages
+        $('#send-btn').click(function() {
+            sendMessage();
+        });
+        
+        // Handle Enter key in message input
+        $('#message-input').keypress(function(e) {
+            if (e.which == 13) {
+                sendMessage();
+            }
+        });
+        
+        // Handle leaving the chat
+        $('#leave-btn').click(function() {
+            socket.emit('left', {});
+            window.location.href = '/home';
+        });
+        
+        // Handle window close
+        $(window).on('beforeunload', function() {
+            socket.emit('left', {});
+        });
+    });
+    
+    function sendMessage() {
+        var message = $('#message-input').val().trim();
+        if (message) {
+            console.log('Sending message:', message);
+            socket.emit('message', {msg: message});
+            $('#message-input').val('');
+        }
+    }
+</script>
+{% endblock %}
+
+{% block maincontent %}
+<div class="chat-container">
+    <h2>Chat Room</h2>
+    <div id="chat"></div>
+    
+    <div class="chat-controls">
+        <input type="text" id="message-input" class="message-input" placeholder="Enter your message here...">
+        <button id="send-btn" class="send-btn">Send</button>
+    </div>
+    
+    <div class="chat-controls">
+        <button id="leave-btn" class="leave-btn">Leave Chat</button>
+    </div>
+</div>
+{% endblock %}
