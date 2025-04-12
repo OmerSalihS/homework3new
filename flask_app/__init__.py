@@ -10,6 +10,7 @@ from flask_socketio import SocketIO
 from flask_failsafe import failsafe
 from flask_login import LoginManager
 from .utils.database.sqlite_database import SQLiteDatabase
+from .database.init_db import init_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +30,10 @@ login_manager.login_view = 'login'
 
 # Initialize database
 db = SQLiteDatabase()
+
+# Initialize database tables
+with app.app_context():
+	init_db()
 
 # Create test users if they don't exist
 def create_test_users():
@@ -53,8 +58,9 @@ def create_test_users():
 	except Exception as e:
 		logger.error(f"Error creating test users: {str(e)}")
 
-# Create test users when the app starts
-create_test_users()
+# Create test users
+with app.app_context():
+	create_test_users()
 
 #--------------------------------------------------
 # Create a Failsafe Web Application
