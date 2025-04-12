@@ -32,20 +32,37 @@ RUN mkdir -p /var/run/mysqld && \
     chown -R mysql:mysql /var/run/mysqld && \
     chmod 777 /var/run/mysqld
 
-# Create startup script
+# Create startup script with better error handling and logging
 RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+echo "Starting MySQL service..."\n\
 service mysql start\n\
-sleep 5\n\
+\n\
+# Wait for MySQL to be ready\n\
+for i in {1..30}; do\n\
+    if mysql -e "SELECT 1" >/dev/null 2>&1; then\n\
+        echo "MySQL is ready!"\n\
+        break\n\
+    fi\n\
+    echo "Waiting for MySQL to be ready... ($i/30)"\n\
+    sleep 1\n\
+done\n\
+\n\
+echo "Setting up MySQL user and database..."\n\
 mysql -e "CREATE USER IF NOT EXISTS '\''master'\''@'\''localhost'\'' IDENTIFIED BY '\''master'\'';"\n\
 mysql -e "CREATE DATABASE IF NOT EXISTS db;"\n\
 mysql -e "GRANT ALL PRIVILEGES ON db.* TO '\''master'\''@'\''localhost'\'';"\n\
 mysql -e "FLUSH PRIVILEGES;"\n\
-exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 app:app' > /app/start.sh && \
+\n\
+echo "Starting Gunicorn..."\n\
+exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 --log-level debug app:app' > /app/start.sh && \
 chmod +x /app/start.sh
 
 # Set environment variables
 ENV PORT=8080
 ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
 
 # Expose the port
 EXPOSE 8080
