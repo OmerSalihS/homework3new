@@ -8,12 +8,6 @@ import itertools
 import datetime
 import hashlib
 from cryptography.fernet import Fernet
-import sqlite3
-import logging
-from flask import current_app
-from werkzeug.security import generate_password_hash, check_password_hash
-
-logger = logging.getLogger(__name__)
 
 class database:
 
@@ -286,94 +280,69 @@ class database:
         
         return result
 
-    def createUser(self, email, password, name='User', role='user'):
+    def createUser(self, email='me@email.com', password='password', role='user', name='User'):
+        """
+        Create a new user in the database.
+        
+        Args:
+            email (str): User's email address
+            password (str): User's password (will be encrypted)
+            role (str): User's role ('guest' or 'owner')
+            name (str): User's name
+            
+        Returns:
+            dict: Information about success or failure of user creation
+                {'success': 1} if successful, {'success': 0, 'message': 'error message'} if failed
+        """
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
+            # First check if user already exists
+            existing_user = self.query("SELECT * FROM users WHERE email = %s", (email,))
+            if existing_user:
+                return {'success': 0, 'message': 'User already exists'}
             
-            # Check if user already exists
-            cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
-            if cursor.fetchone():
-                return {'success': False, 'message': 'User already exists'}
+            # Encrypt the password
+            encrypted_password = self.onewayEncrypt(password)
             
-            # Hash the password
-            hashed_password = generate_password_hash(password)
-            
-            # Insert new user
-            cursor.execute('''
-                INSERT INTO users (email, password, name, role)
-                VALUES (?, ?, ?, ?)
-            ''', (email, hashed_password, name, role))
-            
-            conn.commit()
-            return {'success': True, 'message': 'User created successfully'}
-            
+            # Create new user
+            self.query(
+                "INSERT INTO users (email, password, role, name) VALUES (%s, %s, %s, %s)",
+                (email, encrypted_password, role, name)
+            )
+            return {'success': 1}
         except Exception as e:
-            logger.error(f"Error creating user: {str(e)}")
-            return {'success': False, 'message': 'Error creating user'}
-        finally:
-            conn.close()
-
-    def authenticate(self, email, password):
+            print(f"Error creating user: {str(e)}")
+            return {'success': 0, 'message': str(e)}
+        
+    def authenticate(self, email='me@email.com', password='password'):
+        """
+        Authenticate a user by checking if the email and password combination exists.
+        
+        Args:
+            email (str): User's email address
+            password (str): User's password (will be encrypted and compared)
+            
+        Returns:
+            dict: Information about success or failure of authentication
+                {'success': 1, 'role': 'user_role', 'name': 'user_name'} if successful, 
+                {'success': 0, 'message': 'error message'} if failed
+        """
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
+            # Encrypt the provided password
+            encrypted_password = self.onewayEncrypt(password)
             
-            cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-            user = cursor.fetchone()
-            conn.close()
-            
-            if user and check_password_hash(user['password'], password):
-                return {
-                    'success': True,
-                    'user': {
-                        'id': user['id'],
-                        'email': user['email'],
-                        'name': user['name'],
-                        'role': user['role']
-                    }
-                }
-            else:
-                return {'success': False, 'message': 'Invalid credentials'}
-                
-        except Exception as e:
-            logger.error(f"Error authenticating user: {str(e)}")
-            return {'success': False, 'message': 'Error authenticating user'}
-
-    def getUserById(self, user_id):
-        try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                SELECT id, email, name, role
-                FROM users
-                WHERE id = ?
-            ''', (user_id,))
-            
-            user = cursor.fetchone()
+            # Check if the email and encrypted password combination exists
+            user = self.query(
+                "SELECT * FROM users WHERE email = %s AND password = %s", 
+                (email, encrypted_password)
+            )
             
             if user:
-                return {
-                    'success': True,
-                    'user': {
-                        'id': user[0],
-                        'email': user[1],
-                        'name': user[2],
-                        'role': user[3]
-                    }
-                }
+                return {'success': 1, 'role': user[0]['role'], 'name': user[0]['name']}
             else:
-                return {'success': False, 'message': 'User not found'}
-                
+                return {'success': 0, 'message': 'Invalid email or password'}
         except Exception as e:
-            logger.error(f"Error getting user: {str(e)}")
-            return {'success': False, 'message': 'Error getting user'}
-        finally:
-            conn.close()
-
-    def get_connection(self):
-        return sqlite3.connect(self.db_path)
+            print(f"Error authenticating user: {str(e)}")
+            return {'success': 0, 'message': str(e)}
 
     def onewayEncrypt(self, string):
         """
@@ -403,97 +372,3 @@ class database:
             message = fernet.decrypt(message).decode()
 
         return message
-
-def get_db():
-    """Get a database connection."""
-    db_path = os.path.join(current_app.root_path, 'database', 'app.db')
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def createUser(email, password, name, role='user'):
-    """Create a new user in the database."""
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    # Check if user already exists
-    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
-    if cursor.fetchone():
-        conn.close()
-        return False, 'User already exists'
-    
-    # Create new user
-    hashed_password = generate_password_hash(password)
-    cursor.execute(
-        'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
-        (email, hashed_password, name, role)
-    )
-    conn.commit()
-    conn.close()
-    return True, 'User created successfully'
-
-def authenticate(email, password):
-    """Authenticate a user."""
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM users WHERE email = ?', (email,))
-    user = cursor.fetchone()
-    conn.close()
-    
-    if user and check_password_hash(user['password'], password):
-        return {
-            'success': True,
-            'user': {
-                'id': user['id'],
-                'email': user['email'],
-                'name': user['name'],
-                'role': user['role']
-            }
-        }
-    return {'success': False, 'message': 'Invalid credentials'}
-
-def save_chat_message(user, message, role):
-    """Save a chat message to the database."""
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute('''
-            INSERT INTO chat_messages (user, message, role, timestamp)
-            VALUES (?, ?, ?, ?)
-        ''', (user, message, role, datetime.now().isoformat()))
-        conn.commit()
-    except Exception as e:
-        print(f"Error saving chat message: {e}")
-    finally:
-        conn.close()
-
-def get_chat_messages(limit=50):
-    """Get the most recent chat messages."""
-    conn = get_db()
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute('''
-            SELECT user, message, role, timestamp
-            FROM chat_messages
-            ORDER BY timestamp DESC
-            LIMIT ?
-        ''', (limit,))
-        
-        messages = []
-        for row in cursor.fetchall():
-            messages.append({
-                'user': row[0],
-                'message': row[1],
-                'role': row[2],
-                'timestamp': row[3]
-            })
-        
-        return messages
-    except Exception as e:
-        print(f"Error getting chat messages: {e}")
-        return []
-    finally:
-        conn.close()

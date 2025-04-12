@@ -8,4 +8,3 @@ mysql-connector-python
 SQLAlchemy
 Flask-SQLAlchemy
 python-dotenv
-flask-login
