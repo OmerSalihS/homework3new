@@ -93,8 +93,9 @@
     var isOwner = {% if session.get('role') == 'owner' %}true{% else %}false{% endif %};
     
     $(document).ready(function(){
-        // Connect to the socket server
-        socket = io.connect('http://' + document.domain + ':' + location.port + '/chat', {
+        // Connect to the socket server using a relative URL
+        socket = io.connect(window.location.origin, {
+            path: '/socket.io',
             transports: ['websocket', 'polling']
         });
         

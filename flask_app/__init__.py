@@ -8,7 +8,8 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_failsafe import failsafe
 
-socketio = SocketIO(cors_allowed_origins="*")
+# Initialize SocketIO with async_mode set to eventlet
+socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet')
 
 #--------------------------------------------------
 # Create a Failsafe Web Application
@@ -35,7 +36,8 @@ def create_app(debug=False):
 	db.createUser(email='guest@email.com' ,password='password', role='guest', name='Guest')
 	# ----------------------------------------------
 
-	socketio.init_app(app)
+	# Initialize SocketIO with the app
+	socketio.init_app(app, message_queue=None)
 
 	with app.app_context():
 		from . import routes
