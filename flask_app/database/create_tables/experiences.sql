@@ -1,6 +1,6 @@
 CREATE TABLE experiences (
-    experience_id INT AUTO_INCREMENT PRIMARY KEY,
-    position_id INT NOT NULL,
+    experience_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    position_id INTEGER NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     hyperlink VARCHAR(500),
