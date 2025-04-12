@@ -8,13 +8,14 @@ import itertools
 import datetime
 import hashlib
 from cryptography.fernet import Fernet
+import time
 
 class database:
 
     def __init__(self, purge=False):
         # Grab information from the configuration file
         self.database = 'db'
-        self.host = '127.0.0.1'
+        self.host = 'localhost'  # Using localhost for MySQL
         self.user = 'master'
         self.port = 3306
         self.password = 'master'
@@ -35,32 +36,43 @@ class database:
         self.createTables(purge=purge, data_path='flask_app/database/')
 
     def query(self, query="SELECT CURDATE()", parameters=None):
-        cnx = mysql.connector.connect(host=self.host,
-                                      user=self.user,
-                                      password=self.password,
-                                      port=self.port,
-                                      database=self.database,
-                                      charset='latin1'
-                                     )
+        max_retries = 5
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
+            try:
+                cnx = mysql.connector.connect(host=self.host,
+                                          user=self.user,
+                                          password=self.password,
+                                          port=self.port,
+                                          database=self.database,
+                                          charset='latin1'
+                                         )
 
-        if parameters is not None:
-            cur = cnx.cursor(dictionary=True)
-            cur.execute(query, parameters)
-        else:
-            cur = cnx.cursor(dictionary=True)
-            cur.execute(query)
+                if parameters is not None:
+                    cur = cnx.cursor(dictionary=True)
+                    cur.execute(query, parameters)
+                else:
+                    cur = cnx.cursor(dictionary=True)
+                    cur.execute(query)
 
-        # Fetch one result
-        row = cur.fetchall()
-        cnx.commit()
+                # Fetch one result
+                row = cur.fetchall()
+                cnx.commit()
 
-        if "INSERT" in query:
-            cur.execute("SELECT LAST_INSERT_ID()")
-            row = cur.fetchall()
-            cnx.commit()
-        cur.close()
-        cnx.close()
-        return row
+                if "INSERT" in query:
+                    cur.execute("SELECT LAST_INSERT_ID()")
+                    row = cur.fetchall()
+                    cnx.commit()
+                cur.close()
+                cnx.close()
+                return row
+            except mysql.connector.Error as err:
+                print(f"MySQL error (attempt {attempt+1}/{max_retries}): {err}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                raise err
 
     def about(self, nested=False):    
         query = """select concat(col.table_schema, '.', col.table_name) as 'table',

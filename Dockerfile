@@ -35,9 +35,11 @@ RUN mkdir -p /var/run/mysqld && \
 # Create startup script
 RUN echo '#!/bin/bash\n\
 service mysql start\n\
-mysql -e "CREATE USER '\''master'\''@'\''localhost'\'' IDENTIFIED BY '\''master'\'';"\n\
-mysql -e "CREATE DATABASE db;"\n\
+sleep 5\n\
+mysql -e "CREATE USER IF NOT EXISTS '\''master'\''@'\''localhost'\'' IDENTIFIED BY '\''master'\'';"\n\
+mysql -e "CREATE DATABASE IF NOT EXISTS db;"\n\
 mysql -e "GRANT ALL PRIVILEGES ON db.* TO '\''master'\''@'\''localhost'\'';"\n\
+mysql -e "FLUSH PRIVILEGES;"\n\
 exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 app:app' > /app/start.sh && \
 chmod +x /app/start.sh
 
