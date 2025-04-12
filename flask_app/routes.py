@@ -8,7 +8,12 @@ from pprint import pprint
 import json
 import random
 import functools
+import logging
 from . import socketio
+
+# Configure logging
+logger = logging.getLogger(__name__)
+
 db = database()
 
 #######################################################################################
@@ -37,38 +42,42 @@ def logout():
 
 @app.route('/processlogin', methods = ["POST","GET"])
 def processlogin():
-	form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
-	email = form_fields['email']
-	password = form_fields['password']
-	
-	# Authenticate the user
-	auth_result = db.authenticate(email=email, password=password)
-	
-	if auth_result['success'] == 1:
-		# Store the encrypted email and name in the session
-		session['email'] = db.reversibleEncrypt('encrypt', email)
-		session['name'] = auth_result['name']
-		session['role'] = auth_result['role']
+	try:
+		form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
+		email = form_fields['email']
+		password = form_fields['password']
 		
-		# Reset failed login attempts counter
-		session['failed_attempts'] = 0
+		# Authenticate the user
+		auth_result = db.authenticate(email=email, password=password)
 		
-		# Check if there's a next parameter for redirect
-		next_url = request.args.get('next')
-		if next_url and next_url.startswith('/'):
-			return json.dumps({'success': 1, 'redirect': next_url})
-		return json.dumps({'success': 1, 'redirect': '/home'})
-	else:
-		# Increment failed login attempts counter
-		failed_attempts = session.get('failed_attempts', 0) + 1
-		session['failed_attempts'] = failed_attempts
-		
-		# Authentication failed
-		return json.dumps({
-			'success': 0, 
-			'message': auth_result['message'],
-			'failed_attempts': failed_attempts
-		})
+		if auth_result['success'] == 1:
+			# Store the encrypted email and name in the session
+			session['email'] = db.reversibleEncrypt('encrypt', email)
+			session['name'] = auth_result['name']
+			session['role'] = auth_result['role']
+			
+			# Reset failed login attempts counter
+			session['failed_attempts'] = 0
+			
+			# Check if there's a next parameter for redirect
+			next_url = request.args.get('next')
+			if next_url and next_url.startswith('/'):
+				return json.dumps({'success': 1, 'redirect': next_url})
+			return json.dumps({'success': 1, 'redirect': '/home'})
+		else:
+			# Increment failed login attempts counter
+			failed_attempts = session.get('failed_attempts', 0) + 1
+			session['failed_attempts'] = failed_attempts
+			
+			# Authentication failed
+			return json.dumps({
+				'success': 0, 
+				'message': auth_result['message'],
+				'failed_attempts': failed_attempts
+			})
+	except Exception as e:
+		logger.error(f"Error in processlogin: {str(e)}")
+		return json.dumps({'success': 0, 'message': 'An error occurred during login'})
 
 
 #######################################################################################
@@ -81,34 +90,46 @@ def chat():
 
 @socketio.on('joined', namespace='/chat')
 def joined(message):
-    join_room('main')
-    user = getUser()
-    is_owner = session.get('role') == 'owner'
-    role = "Owner" if is_owner else "Guest"
-    emit('status', {'msg': f"{user} ({role}) has entered the room.", 'class': 'system-message'}, room='main')
+    try:
+        logger.info("User joined chat")
+        join_room('main')
+        user = getUser()
+        is_owner = session.get('role') == 'owner'
+        role = "Owner" if is_owner else "Guest"
+        emit('status', {'msg': f"{user} ({role}) has entered the room.", 'class': 'system-message'}, room='main')
+    except Exception as e:
+        logger.error(f"Error in joined event: {str(e)}")
 
 @socketio.on('left', namespace='/chat')
 def left(message):
-    user = getUser()
-    is_owner = session.get('role') == 'owner'
-    role = "Owner" if is_owner else "Guest"
-    emit('status', {'msg': f"{user} ({role}) has left the room.", 'class': 'system-message'}, room='main')
-    leave_room('main')
+    try:
+        logger.info("User left chat")
+        user = getUser()
+        is_owner = session.get('role') == 'owner'
+        role = "Owner" if is_owner else "Guest"
+        emit('status', {'msg': f"{user} ({role}) has left the room.", 'class': 'system-message'}, room='main')
+        leave_room('main')
+    except Exception as e:
+        logger.error(f"Error in left event: {str(e)}")
 
 @socketio.on('message', namespace='/chat')
 def handle_message(message):
-    user = getUser()
-    is_owner = session.get('role') == 'owner'
-    role = "Owner" if is_owner else "Guest"
-    
-    # Determine message class based on user role
-    msg_class = 'owner-message' if is_owner else 'user-message'
-    
-    # Format the message with the user's name and role
-    formatted_msg = f"{user} ({role}): {message['msg']}"
-    
-    # Emit the message to all users in the room
-    emit('status', {'msg': formatted_msg, 'class': msg_class}, room='main')
+    try:
+        logger.info(f"Received message: {message}")
+        user = getUser()
+        is_owner = session.get('role') == 'owner'
+        role = "Owner" if is_owner else "Guest"
+        
+        # Determine message class based on user role
+        msg_class = 'owner-message' if is_owner else 'user-message'
+        
+        # Format the message with the user's name and role
+        formatted_msg = f"{user} ({role}): {message['msg']}"
+        
+        # Emit the message to all users in the room
+        emit('status', {'msg': formatted_msg, 'class': msg_class}, room='main')
+    except Exception as e:
+        logger.error(f"Error in handle_message event: {str(e)}")
 
 #######################################################################################
 # OTHER
@@ -125,9 +146,13 @@ def home():
 
 @app.route('/resume')
 def resume():
-	resume_data = db.getResumeData()
-	pprint(resume_data)
-	return render_template('resume.html', resume_data = resume_data)
+	try:
+		resume_data = db.getResumeData()
+		pprint(resume_data)
+		return render_template('resume.html', resume_data = resume_data)
+	except Exception as e:
+		logger.error(f"Error in resume route: {str(e)}")
+		return render_template('resume.html', resume_data = [])
 
 @app.route('/projects')
 def projects():
@@ -139,25 +164,29 @@ def piano():
 
 @app.route('/processfeedback', methods=['POST'])
 def processfeedback():
-    # Access the form data
-    feedback = request.form
-    
-    # Extract the data
-    name = feedback.get('name')
-    email = feedback.get('email')
-    comment = feedback.get('comment')
-    
-    # Insert the feedback into the database
-    columns = ['name', 'email', 'comment']
-    parameters = [[name, email, comment]]
-    db.insertRows(table='feedback', columns=columns, parameters=parameters)
-    
-    # Retrieve all feedback from the database
-    feedback_query = "SELECT * FROM feedback ORDER BY comment_id DESC"
-    all_feedback = db.query(feedback_query)
-    
-    # Render the feedback template with all feedback data
-    return render_template('processfeedback.html', feedback_data=all_feedback)
+    try:
+        # Access the form data
+        feedback = request.form
+        
+        # Extract the data
+        name = feedback.get('name')
+        email = feedback.get('email')
+        comment = feedback.get('comment')
+        
+        # Insert the feedback into the database
+        columns = ['name', 'email', 'comment']
+        parameters = [[name, email, comment]]
+        db.insertRows(table='feedback', columns=columns, parameters=parameters)
+        
+        # Retrieve all feedback from the database
+        feedback_query = "SELECT * FROM feedback ORDER BY comment_id DESC"
+        all_feedback = db.query(feedback_query)
+        
+        # Render the feedback template with all feedback data
+        return render_template('processfeedback.html', feedback_data=all_feedback)
+    except Exception as e:
+        logger.error(f"Error in processfeedback route: {str(e)}")
+        return render_template('processfeedback.html', feedback_data=[])
 
 @app.route('/register')
 def register():
@@ -165,13 +194,17 @@ def register():
 
 @app.route('/processregister', methods=["POST", "GET"])
 def processregister():
-    form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
-    email = form_fields['email']
-    password = form_fields['password']
-    role = form_fields['role']
-    name = form_fields['name']
-    
-    # Create the user
-    result = db.createUser(email=email, password=password, role=role, name=name)
-    
-    return json.dumps(result)
+    try:
+        form_fields = dict((key, request.form.getlist(key)[0]) for key in list(request.form.keys()))
+        email = form_fields['email']
+        password = form_fields['password']
+        role = form_fields['role']
+        name = form_fields['name']
+        
+        # Create the user
+        result = db.createUser(email=email, password=password, role=role, name=name)
+        
+        return json.dumps(result)
+    except Exception as e:
+        logger.error(f"Error in processregister route: {str(e)}")
+        return json.dumps({'success': 0, 'message': 'An error occurred during registration'})
