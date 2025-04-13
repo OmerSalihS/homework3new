@@ -27,18 +27,40 @@ ENV PORT=8080
 ENV FLASK_ENV=production
 ENV MYSQL_HOST=localhost
 ENV MYSQL_PORT=3306
+ENV PYTHONUNBUFFERED=1
 
 # Expose the ports
 EXPOSE 8080 3306
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Start MySQL service\n\
 service mysql start\n\
-mysql -e "CREATE DATABASE IF NOT EXISTS your_database_name;"\n\
-mysql -e "CREATE USER IF NOT EXISTS your_user@localhost IDENTIFIED BY your_password;"\n\
-mysql -e "GRANT ALL PRIVILEGES ON your_database_name.* TO your_user@localhost;"\n\
+\n\
+# Wait for MySQL to be ready\n\
+until mysqladmin ping -h"localhost" --silent; do\n\
+    echo "Waiting for MySQL to be ready..."\n\
+    sleep 1\n\
+done\n\
+\n\
+# Initialize database\n\
+mysql -e "CREATE DATABASE IF NOT EXISTS homework3;"\n\
+mysql -e "CREATE USER IF NOT EXISTS homework3@localhost IDENTIFIED BY homework3;"\n\
+mysql -e "GRANT ALL PRIVILEGES ON homework3.* TO homework3@localhost;"\n\
 mysql -e "FLUSH PRIVILEGES;"\n\
-exec gunicorn --bind :$PORT --workers 1 --worker-class eventlet --threads 8 --timeout 0 app:app' > /app/start.sh
+\n\
+# Start the application with proper logging\n\
+exec gunicorn --bind :$PORT \\\n\
+    --workers 1 \\\n\
+    --worker-class eventlet \\\n\
+    --threads 8 \\\n\
+    --timeout 0 \\\n\
+    --log-level debug \\\n\
+    --access-logfile - \\\n\
+    --error-logfile - \\\n\
+    app:app' > /app/start.sh
 
 RUN chmod +x /app/start.sh
 
