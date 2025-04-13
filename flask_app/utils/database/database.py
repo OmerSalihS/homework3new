@@ -20,11 +20,6 @@ class database:
         self.port = 3306
         self.password = 'master'
         
-        # Add connection timeout and retry settings
-        self.connection_timeout = 30  # seconds
-        self.max_retries = 5
-        self.retry_delay = 2  # seconds
-        
         # Encryption settings
         self.encryption = {
             'oneway': {
@@ -38,48 +33,21 @@ class database:
             }
         }
         
-        # Wait for database to be ready
-        self._wait_for_database()
-        
         self.createTables(purge=purge, data_path='flask_app/database/')
 
-    def _wait_for_database(self):
-        """Wait for the database to be ready before proceeding."""
-        print("Waiting for database to be ready...")
-        for attempt in range(self.max_retries):
-            try:
-                cnx = mysql.connector.connect(
-                    host=self.host,
-                    user=self.user,
-                    password=self.password,
-                    port=self.port,
-                    database=self.database,
-                    charset='latin1',
-                    connect_timeout=self.connection_timeout
-                )
-                cnx.close()
-                print("Database is ready!")
-                return
-            except mysql.connector.Error as err:
-                print(f"Database connection attempt {attempt + 1}/{self.max_retries} failed: {err}")
-                if attempt < self.max_retries - 1:
-                    time.sleep(self.retry_delay)
-                else:
-                    print("Could not connect to database after maximum retries")
-                    raise
-
     def query(self, query="SELECT CURDATE()", parameters=None):
-        for attempt in range(self.max_retries):
+        max_retries = 5
+        retry_delay = 2
+        
+        for attempt in range(max_retries):
             try:
-                cnx = mysql.connector.connect(
-                    host=self.host,
-                    user=self.user,
-                    password=self.password,
-                    port=self.port,
-                    database=self.database,
-                    charset='latin1',
-                    connect_timeout=self.connection_timeout
-                )
+                cnx = mysql.connector.connect(host=self.host,
+                                          user=self.user,
+                                          password=self.password,
+                                          port=self.port,
+                                          database=self.database,
+                                          charset='latin1'
+                                         )
 
                 if parameters is not None:
                     cur = cnx.cursor(dictionary=True)
@@ -100,9 +68,9 @@ class database:
                 cnx.close()
                 return row
             except mysql.connector.Error as err:
-                print(f"MySQL error (attempt {attempt+1}/{self.max_retries}): {err}")
-                if attempt < self.max_retries - 1:
-                    time.sleep(self.retry_delay)
+                print(f"MySQL error (attempt {attempt+1}/{max_retries}): {err}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
                     continue
                 raise err
 
@@ -165,39 +133,36 @@ class database:
                 with open(data_path + f"create_tables/{table}.sql") as read_file:
                     create_statement = read_file.read()
                 
-                # Check if table exists
-                table_exists = self.query(f"SHOW TABLES LIKE '{table}'")
-                if not table_exists:
-                    # Only create if table doesn't exist
-                    self.query(create_statement)
-                    print(f"Created table {table}")
-                else:
-                    print(f"Table {table} already exists, skipping creation")
+                # Modify the SQL to use IF NOT EXISTS
+                if "CREATE TABLE" in create_statement and "IF NOT EXISTS" not in create_statement:
+                    create_statement = create_statement.replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS")
+                
+                self.query(create_statement)
             except Exception as e:
                 print(f"Error executing SQL: {str(e)}")
                 print(f"Problematic statement: {create_statement}")
+                # Continue with next table even if this one fails
                 continue
 
-        # Insert initial data only if tables were just created or if purge was True
-        if purge:
-            for table in table_order:
-                try:
-                    print(f"Inserting data into '{table}' from '{data_path}initial_data/{table}.csv'")
-                    params = []
-                    with open(data_path + f"initial_data/{table}.csv") as read_file:
-                        scsv = read_file.read()            
-                    for row in csv.reader(StringIO(scsv), delimiter=','):
-                        params.append(row)
-                
-                    # Insert the data
-                    cols = params[0]; params = params[1:] 
-                    self.insertRows(table=table, columns=cols, parameters=params)
-                except Exception as e:
-                    print(f"Error inserting into {table}: {str(e)}")
-                    if 'params' in locals() and len(params) > 0:
-                        print(f"Problematic row: {params[0]}")
-                    else:
-                        print('no initial data')
+        # Insert initial data
+        for table in table_order:
+            try:
+                print(f"Inserting data into '{table}' from '{data_path}initial_data/{table}.csv'")
+                params = []
+                with open(data_path + f"initial_data/{table}.csv") as read_file:
+                    scsv = read_file.read()            
+                for row in csv.reader(StringIO(scsv), delimiter=','):
+                    params.append(row)
+            
+                # Insert the data
+                cols = params[0]; params = params[1:] 
+                self.insertRows(table=table, columns=cols, parameters=params)
+            except Exception as e:
+                print(f"Error inserting into {table}: {str(e)}")
+                if 'params' in locals() and len(params) > 0:
+                    print(f"Problematic row: {params[0]}")
+                else:
+                    print('no initial data')
 
         print("----- Done creating and populating tables -----")
 
