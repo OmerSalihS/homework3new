@@ -17,7 +17,7 @@ class database:
         self.host = os.environ.get('MYSQL_HOST', '127.0.0.1')
         self.user = os.environ.get('MYSQL_USER', 'homework3')
         self.port = int(os.environ.get('MYSQL_PORT', 3306))
-        self.password = os.environ.gxet('MYSQL_PASSWORD', 'homework3')
+        self.password = os.environ.get('MYSQL_PASSWORD', 'homework3')
     
     # Rest of your initialization remains the same...
         
