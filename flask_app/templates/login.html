@@ -1,0 +1,116 @@
+{% extends 'shared/layout.html' %}
+
+{% block extrajs %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block extracss %}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .btn-login {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+    }
+    .btn-login:hover {
+        background-color: #45a049;
+    }
+    .error-message {
+        color: red;
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block maincontent %}
+<div class="login-container">
+    <h2>Login</h2>
+    <form id="login-form">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="button" class="btn-login" onclick="checkCredentials()">Login</button>
+        <div id="error-message" class="error-message"></div>
+    </form>
+</div>
+
+<script>
+function checkCredentials() {
+    // Get form values
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    // Validate form
+    if (!email || !password) {
+        document.getElementById('error-message').textContent = 'Please enter both email and password';
+        document.getElementById('error-message').style.display = 'block';
+        return;
+    }
+    
+    // Package data in a JSON object
+    const data_d = {'email': email, 'password': password};
+    console.log('data_d', data_d);
+
+    // Get the next parameter from the URL if it exists
+    const urlParams = new URLSearchParams(window.location.search);
+    const nextUrl = urlParams.get('next');
+    const processLoginUrl = nextUrl ? `/processlogin?next=${nextUrl}` : '/processlogin';
+
+    // Send data to server via jQuery.ajax
+    jQuery.ajax({
+        url: processLoginUrl,
+        data: data_d,
+        type: "POST",
+        success: function(returned_data) {
+            returned_data = JSON.parse(returned_data);
+            if (returned_data.success === 1) {
+                window.location.href = returned_data.redirect || '/home';
+            } else {
+                let errorMsg = returned_data.message || 'Login failed';
+                if (returned_data.failed_attempts) {
+                    errorMsg += ` (Failed attempts: ${returned_data.failed_attempts})`;
+                }
+                document.getElementById('error-message').textContent = errorMsg;
+                document.getElementById('error-message').style.display = 'block';
+            }
+        },
+        error: function() {
+            document.getElementById('error-message').textContent = 'Server error. Please try again later.';
+            document.getElementById('error-message').style.display = 'block';
+        }
+    });
+}
+</script>
+{% endblock %}
+
+

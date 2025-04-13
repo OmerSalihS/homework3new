@@ -206,3 +206,18 @@ footer {
         max-width: 80%;
     }
 }
+
+/* User Info Styling */
+.user-info {
+    background-color: #f0f0f0;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+    border-left: 4px solid #333;
+}
+
+.user-info p {
+    margin: 0;
+    color: #333;
+    font-size: 0.9rem;
+}

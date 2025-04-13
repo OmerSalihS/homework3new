@@ -1,0 +1,147 @@
+{% extends 'shared/layout.html' %}
+
+{% block extrajs %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+{% endblock %}
+
+{% block extracss %}
+<style>
+    .register-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .btn-register {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+    }
+    .btn-register:hover {
+        background-color: #45a049;
+    }
+    .error-message {
+        color: red;
+        margin-top: 10px;
+        display: none;
+    }
+    .success-message {
+        color: green;
+        margin-top: 10px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block maincontent %}
+<div class="register-container">
+    <h2>Register</h2>
+    <form id="register-form">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+        </div>
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" required>
+                <option value="guest">Guest</option>
+                <option value="owner">Owner</option>
+            </select>
+        </div>
+        <button type="button" class="btn-register" onclick="registerUser()">Register</button>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+    </form>
+</div>
+
+<script>
+function registerUser() {
+    // Get form values
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const role = document.getElementById('role').value;
+    
+    // Validate form
+    if (!name || !email || !password || !confirmPassword) {
+        document.getElementById('error-message').textContent = 'Please fill in all fields';
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('success-message').style.display = 'none';
+        return;
+    }
+    
+    // Check if passwords match
+    if (password !== confirmPassword) {
+        document.getElementById('error-message').textContent = 'Passwords do not match';
+        document.getElementById('error-message').style.display = 'block';
+        document.getElementById('success-message').style.display = 'none';
+        return;
+    }
+    
+    // Package data in a JSON object
+    const data_d = {'name': name, 'email': email, 'password': password, 'role': role};
+    console.log('data_d', data_d);
+
+    // Send data to server via jQuery.ajax
+    jQuery.ajax({
+        url: "/processregister",
+        data: data_d,
+        type: "POST",
+        success: function(returned_data) {
+            returned_data = JSON.parse(returned_data);
+            if (returned_data.success === 1) {
+                document.getElementById('success-message').textContent = 'Registration successful! Redirecting to login...';
+                document.getElementById('success-message').style.display = 'block';
+                document.getElementById('error-message').style.display = 'none';
+                
+                // Redirect to login page after 2 seconds
+                setTimeout(function() {
+                    window.location.href = "/login";
+                }, 2000);
+            } else {
+                document.getElementById('error-message').textContent = returned_data.message || 'Registration failed';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+            }
+        },
+        error: function() {
+            document.getElementById('error-message').textContent = 'Server error. Please try again later.';
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %} 

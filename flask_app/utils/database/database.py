@@ -6,6 +6,8 @@ import os
 from io import StringIO
 import itertools
 import datetime
+import hashlib
+from cryptography.fernet import Fernet
 
 class database:
 
@@ -16,6 +18,20 @@ class database:
         self.user = 'master'
         self.port = 3306
         self.password = 'master'
+        
+        # Encryption settings
+        self.encryption = {
+            'oneway': {
+                'salt': b'averysaltysailortookalongwalkoffashortbridge',
+                'n': 2**5,  # CPU/memory cost factor
+                'r': 9,     # Block size factor
+                'p': 1      # Parallelization factor
+            },
+            'reversible': {
+                'key': '7pK_fnSKIjZKuv_Gwc--sZEMKn2zc8VvD6zS96XcNHE='
+            }
+        }
+        
         self.createTables(purge=purge, data_path='flask_app/database/')
 
     def query(self, query="SELECT CURDATE()", parameters=None):
@@ -88,64 +104,48 @@ class database:
             print('Purging (dropping) existing tables...')
             # Temporarily turn off foreign key checks so we can drop in any order
             self.query("SET FOREIGN_KEY_CHECKS=0")
-
-            # Collect existing table names (via self.about)
-            existing_tables = self.about(nested=False)
-            
-            # Build a dependency graph to determine drop order
-            table_dependencies = {}
-            for row in existing_tables:
-                table_name = row['table'].split('.')[1]  # e.g., extract 'positions' from 'db.positions'
-                if table_name not in table_dependencies:
-                    table_dependencies[table_name] = set()
-                
-                if row['fk_table_name']:
-                    # This table depends on the referenced table
-                    table_dependencies[table_name].add(row['fk_table_name'])
-            
-            # Get tables in order of their dependencies (children first, then parents)
-            tables_to_drop = self.get_drop_order(table_dependencies)
-            
-            # Drop tables in the correct order
-            for table_name in tables_to_drop:
-                drop_sql = f"DROP TABLE IF EXISTS `{table_name}`"
+            for table in ['skills', 'experiences', 'positions', 'institutions', 'feedback', 'users']:
                 try:
-                    self.query(drop_sql)
-                    print(f"Dropped table {table_name}")
-                except mysql.connector.Error as err:
-                    print(f"Error dropping {table_name}: {err}")
-
-            # Re-enable foreign key checks
+                    self.query(f"DROP TABLE IF EXISTS {table}")
+                    print(f"Dropped table {table}")
+                except Exception as e:
+                    print(f"Error dropping {table}: {str(e)}")
             self.query("SET FOREIGN_KEY_CHECKS=1")
-            print('Done purging!')
+            print("Done purging!")
 
-        # Step 1: Run all .sql files in create_tables folder
-        sql_files = sorted(glob.glob(os.path.join(data_path, "create_tables", "*.sql")))
-        for sql_file in sql_files:
-            print(f"Running {sql_file}")
-            with open(sql_file, 'r', encoding='utf-8') as f:
-                sql_script = f.read()
-                # A .sql file may contain multiple statements separated by ';'
-                statements = [s.strip() for s in sql_script.split(';') if s.strip()]
-                for stmt in statements:
-                    try:
-                        self.query(stmt)
-                    except mysql.connector.Error as err:
-                        print(f"Error executing SQL: {err}")
-                        print(f"Problematic statement: {stmt[:100]}...")  # Print first 100 chars of statement
+        # Create tables in the correct order
+        table_order = ['users', 'institutions', 'positions', 'experiences', 'skills', 'feedback']
+        for table in table_order:
+            try:
+                print(f"Running {data_path}create_tables/{table}.sql")
+                with open(data_path + f"create_tables/{table}.sql") as read_file:
+                    create_statement = read_file.read()
+                self.query(create_statement)
+            except Exception as e:
+                print(f"Error executing SQL: {str(e)}")
+                print(f"Problematic statement: {create_statement}")
 
-        # Step 2: Insert data from each CSV in initial_data folder
-        csv_files = sorted(glob.glob(os.path.join(data_path, "initial_data", "*.csv")))
-        for csv_file in csv_files:
-            table_name = os.path.splitext(os.path.basename(csv_file))[0]
-            print(f"Inserting data into '{table_name}' from '{csv_file}'")
-            with open(csv_file, 'r', encoding='utf-8-sig') as f:
-                reader = csv.reader(f)
-                columns = next(reader)  # first row is the column headers
-                rows = [r for r in reader]  # remaining rows
-            self.insertRows(table=table_name, columns=columns, parameters=rows)
+        # Insert initial data
+        for table in table_order:
+            try:
+                print(f"Inserting data into '{table}' from '{data_path}initial_data/{table}.csv'")
+                params = []
+                with open(data_path + f"initial_data/{table}.csv") as read_file:
+                    scsv = read_file.read()            
+                for row in csv.reader(StringIO(scsv), delimiter=','):
+                    params.append(row)
+            
+                # Insert the data
+                cols = params[0]; params = params[1:] 
+                self.insertRows(table=table, columns=cols, parameters=params)
+            except Exception as e:
+                print(f"Error inserting into {table}: {str(e)}")
+                if 'params' in locals() and len(params) > 0:
+                    print(f"Problematic row: {params[0]}")
+                else:
+                    print('no initial data')
 
-        print('----- Done creating and populating tables -----\n')
+        print("----- Done creating and populating tables -----")
 
     def get_drop_order(self, dependencies):
         """
@@ -279,3 +279,96 @@ class database:
                         }
         
         return result
+
+    def createUser(self, email='me@email.com', password='password', role='user', name='User'):
+        """
+        Create a new user in the database.
+        
+        Args:
+            email (str): User's email address
+            password (str): User's password (will be encrypted)
+            role (str): User's role ('guest' or 'owner')
+            name (str): User's name
+            
+        Returns:
+            dict: Information about success or failure of user creation
+                {'success': 1} if successful, {'success': 0, 'message': 'error message'} if failed
+        """
+        try:
+            # First check if user already exists
+            existing_user = self.query("SELECT * FROM users WHERE email = %s", (email,))
+            if existing_user:
+                return {'success': 0, 'message': 'User already exists'}
+            
+            # Encrypt the password
+            encrypted_password = self.onewayEncrypt(password)
+            
+            # Create new user
+            self.query(
+                "INSERT INTO users (email, password, role, name) VALUES (%s, %s, %s, %s)",
+                (email, encrypted_password, role, name)
+            )
+            return {'success': 1}
+        except Exception as e:
+            print(f"Error creating user: {str(e)}")
+            return {'success': 0, 'message': str(e)}
+        
+    def authenticate(self, email='me@email.com', password='password'):
+        """
+        Authenticate a user by checking if the email and password combination exists.
+        
+        Args:
+            email (str): User's email address
+            password (str): User's password (will be encrypted and compared)
+            
+        Returns:
+            dict: Information about success or failure of authentication
+                {'success': 1, 'role': 'user_role', 'name': 'user_name'} if successful, 
+                {'success': 0, 'message': 'error message'} if failed
+        """
+        try:
+            # Encrypt the provided password
+            encrypted_password = self.onewayEncrypt(password)
+            
+            # Check if the email and encrypted password combination exists
+            user = self.query(
+                "SELECT * FROM users WHERE email = %s AND password = %s", 
+                (email, encrypted_password)
+            )
+            
+            if user:
+                return {'success': 1, 'role': user[0]['role'], 'name': user[0]['name']}
+            else:
+                return {'success': 0, 'message': 'Invalid email or password'}
+        except Exception as e:
+            print(f"Error authenticating user: {str(e)}")
+            return {'success': 0, 'message': str(e)}
+
+    def onewayEncrypt(self, string):
+        """
+        Encrypt a string using scrypt (one-way encryption).
+        
+        Args:
+            string (str): The string to encrypt
+            
+        Returns:
+            str: The encrypted string in hexadecimal format
+        """
+        encrypted_string = hashlib.scrypt(
+            string.encode('utf-8'),
+            salt=self.encryption['oneway']['salt'],
+            n=self.encryption['oneway']['n'],
+            r=self.encryption['oneway']['r'],
+            p=self.encryption['oneway']['p']
+        ).hex()
+        return encrypted_string
+
+    def reversibleEncrypt(self, type, message):
+        fernet = Fernet(self.encryption['reversible']['key'])
+        
+        if type == 'encrypt':
+            message = fernet.encrypt(message.encode())
+        elif type == 'decrypt':
+            message = fernet.decrypt(message).decode()
+
+        return message

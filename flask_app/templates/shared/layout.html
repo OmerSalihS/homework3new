@@ -23,7 +23,10 @@
     <article>
     <!-- The header  -->
     <header>
-        <p> Welcome to my Personal Website </p>
+        <p>Welcome to my Personal Website</p>
+        {% if session.get('name') %}
+            <p class="welcome-text">Welcome, {{ session.get('name') }}!</p>
+        {% endif %}
     </header>
 
     <!-- The navigation bar -->
@@ -37,6 +40,14 @@
         <a href="/resume">Resume</a>
         <a href="/projects">Projects</a>
         <a href="/piano">Piano</a>
+        {% if session.get('email') %}
+          <a href="/chat">Chat</a>
+          <a href="/logout">Logout</a>
+        {% else %}
+          <a href="/chat">Chat</a>
+          <a href="/login">Login</a>
+          <a href="/register">Register</a>
+        {% endif %}
       </div>
     </nav>
 
