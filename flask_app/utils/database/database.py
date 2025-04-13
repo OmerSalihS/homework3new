@@ -12,12 +12,14 @@ from cryptography.fernet import Fernet
 class database:
 
     def __init__(self, purge=False):
-        # Grab information from the configuration file
-        self.database = 'db'
-        self.host = '127.0.0.1'
-        self.user = 'master'
-        self.port = 3306
-        self.password = 'master'
+        # Grab information from the environment variables with fallbacks
+        self.database = os.environ.get('MYSQL_DATABASE', 'homework3')
+        self.host = os.environ.get('MYSQL_HOST', '127.0.0.1')
+        self.user = os.environ.get('MYSQL_USER', 'homework3')
+        self.port = int(os.environ.get('MYSQL_PORT', 3306))
+        self.password = os.environ.gxet('MYSQL_PASSWORD', 'homework3')
+    
+    # Rest of your initialization remains the same...
         
         # Encryption settings
         self.encryption = {
@@ -35,25 +37,39 @@ class database:
         self.createTables(purge=purge, data_path='flask_app/database/')
 
     def query(self, query="SELECT CURDATE()", parameters=None):
-        cnx = mysql.connector.connect(host=self.host,
-                                      user=self.user,
-                                      password=self.password,
-                                      port=self.port,
-                                      database=self.database,
-                                      charset='latin1'
-                                     )
-
+    # Check if we're using Unix socket (Cloud SQL) or TCP
+        if self.host.startswith('/cloudsql/'):
+            # Unix socket connection for Cloud SQL
+            cnx = mysql.connector.connect(
+                unix_socket=self.host,
+                user=self.user,
+                password=self.password,
+                database=self.database,
+                charset='latin1'
+            )
+        else:
+            # Regular TCP connection
+            cnx = mysql.connector.connect(
+                host=self.host,
+                user=self.user,
+                password=self.password,
+                port=self.port,
+                database=self.database,
+                charset='latin1'
+            )
+        
+        # Rest of the method stays the same
         if parameters is not None:
             cur = cnx.cursor(dictionary=True)
             cur.execute(query, parameters)
         else:
             cur = cnx.cursor(dictionary=True)
             cur.execute(query)
-
+            
         # Fetch one result
         row = cur.fetchall()
         cnx.commit()
-
+        
         if "INSERT" in query:
             cur.execute("SELECT LAST_INSERT_ID()")
             row = cur.fetchall()
